@@ -9,7 +9,7 @@ export class User {
   name: string;
   @Column('text', { unique: true })
   email: string;
-  @Column('text')
+  @Column('text', {select: false})
   password: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
