@@ -16,5 +16,10 @@ export class AuthController {
     return this.authService.login(loginUserDto)
   }
 
+  @Get('private')
+  testingPrivateRoute(){
+    return 'hola mundo desde private route'
+  }
+
 
 }
