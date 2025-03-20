@@ -2,8 +2,10 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../models/enums/user-role.enum';
 
@@ -23,6 +25,12 @@ export class User {
 
   @Column('bool', { default: true })
   isActive: boolean;
+
+  @CreateDateColumn({type: 'timestamptz', nullable: false})
+  createdAt: Date;
+
+  @Column({type: 'timestamptz' , nullable: true})
+  updatedAt: Date;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
