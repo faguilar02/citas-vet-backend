@@ -24,8 +24,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.authService.create(createUserDto);
+  registerUser(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 
   @Post('login')
@@ -51,7 +51,7 @@ export class AuthController {
   }
 
   @Get('private2')
-  @RoleProtected(UserRole.VETERINARIO)
+  @RoleProtected(UserRole.VETERINARIAN)
   @UseGuards(AuthGuard(), UserRoleGuard)
   privateRoute2(@GetUser() user: User) {
     return {

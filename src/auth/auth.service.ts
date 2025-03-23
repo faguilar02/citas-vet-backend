@@ -19,7 +19,7 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService:JwtService
   ) {}
-  async create(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     try {
       const { password, ...userData } = createUserDto;
       const user = this.userRepository.create({
@@ -30,7 +30,7 @@ export class AuthService {
       await this.userRepository.save(user);
       delete user.password;
       return {
-        ...user, token: this.getJwtToken({id: user.id})
+        ...user, token: this.getJwtToken({userId: user.userId})
       };
     } catch (error) {
       this.handleDBErrors(error);
@@ -59,7 +59,7 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true , id:true},
+      select: { email: true, password: true , userId:true},
     });
 
     if (!user)
@@ -68,7 +68,7 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credentials are not valid (password)');
     return {
-      ...user, token: this.getJwtToken({id: user.id})
+      ...user, token: this.getJwtToken({userId: user.userId})
     };
   }
 }
