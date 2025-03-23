@@ -12,7 +12,7 @@ import { UserRole } from '../models/enums/user-role.enum';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  userId: string;
   @Column('text')
   fullName: string;
   @Column('text', { unique: true })
