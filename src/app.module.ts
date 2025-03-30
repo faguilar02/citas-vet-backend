@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-// import { VeterinarianModule } from './veterinarian/veterinarian.module';
+import { VeterinarianModule } from './veterinarian/veterinarian.module';
 
 
 @Module({
@@ -20,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
 
     }),
     AuthModule,
-    // VeterinarianModule
+    VeterinarianModule,
   ],
   controllers: [],
   providers: [],
