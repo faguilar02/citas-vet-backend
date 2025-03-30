@@ -29,7 +29,7 @@ export class User {
   @CreateDateColumn({type: 'timestamptz', nullable: false})
   createdAt: Date;
 
-  @Column({type: 'timestamptz' , nullable: true})
+  @UpdateDateColumn({type: 'timestamptz' , nullable: true})
   updatedAt: Date;
 
   @BeforeInsert()

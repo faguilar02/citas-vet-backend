@@ -9,9 +9,11 @@ import {
   UseGuards,
   Req,
   SetMetadata,
+  ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto } from './dto';
+import { CreateUserDto, LoginUserDto, PaginationDto, UpdateUserDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 
 import { User } from './entities/user.entity';
@@ -33,39 +35,63 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
-  @Get('private')
-  @UseGuards(AuthGuard())
-  testingPrivateRoute(
-    @Req() request: Express.Request,
-    @GetUser() user: User,
-    @GetUser('email') userEmail: string,
-    @RawHeaders() rawHeaders: string[],
-  ) {
-    return {
-      ok: true,
-      message: 'hola mundo desde private route',
-      user: user,
-      userEmail: userEmail,
-      rawHeaders,
-    };
+  @Auth(UserRole.ADMIN)
+  @Get('users')
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.authService.findAll(paginationDto)
   }
 
-  @Get('private2')
-  @RoleProtected(UserRole.VETERINARIAN)
-  @UseGuards(AuthGuard(), UserRoleGuard)
-  privateRoute2(@GetUser() user: User) {
-    return {
-      ok: true,
-      user,
-    };
-  }
-
-  @Get('private3')
+  @Get(':id')
   @Auth()
-  privateRoute3(@GetUser() user: User) {
-    return {
-      ok: true,
-      user,
-    };
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.authService.findOne(id)
   }
+
+  @Patch(':id')
+  @Auth()
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.authService.update(id, updateUserDto)
+  }
+
+  @Delete(':id')
+  @Auth(UserRole.ADMIN)
+  desactivateUser(@Param('id', ParseUUIDPipe) id:string){
+    return this.authService.desactivateUser(id)
+  }
+
+  // @Get('private')
+  // @UseGuards(AuthGuard())
+  // testingPrivateRoute(
+  //   @Req() request: Express.Request,
+  //   @GetUser() user: User,
+  //   @GetUser('email') userEmail: string,
+  //   @RawHeaders() rawHeaders: string[],
+  // ) {
+  //   return {
+  //     ok: true,
+  //     message: 'hola mundo desde private route',
+  //     user: user,
+  //     userEmail: userEmail,
+  //     rawHeaders,
+  //   };
+  // }
+
+  // @Get('private2')
+  // @RoleProtected(UserRole.VETERINARIAN)
+  // @UseGuards(AuthGuard(), UserRoleGuard)
+  // privateRoute2(@GetUser() user: User) {
+  //   return {
+  //     ok: true,
+  //     user,
+  //   };
+  // }
+
+  // @Get('private3')
+  // @Auth()
+  // privateRoute3(@GetUser() user: User) {
+  //   return {
+  //     ok: true,
+  //     user,
+  //   };
+  // }
 }
