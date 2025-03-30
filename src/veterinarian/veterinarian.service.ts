@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Veterinarian } from './entities/veterinarian.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from 'src/auth/models/enums';
+import { PaginationDto } from 'src/auth/dto/pagination.dto';
 
 @Injectable()
 export class VeterinarianService {
@@ -18,21 +19,18 @@ export class VeterinarianService {
     @InjectRepository(Veterinarian)
     private readonly veterinarianRepository: Repository<Veterinarian>,
   ) {}
+
   async create(createVeterinarianDto: CreateVeterinarianDto) {
     try {
-      const { email, fullName, password, specialty } = createVeterinarianDto;
-      const user = await this.authService.register({
-        email,
-        fullName,
-        password,
-      });
+      const { specialty, ...user } = createVeterinarianDto;
 
       const veterinarian = this.veterinarianRepository.create({
-        user: user,
-        specialty: specialty,
+        specialty,
+        user: await this.authService.register(user),
       });
 
       veterinarian.user.role = UserRole.VETERINARIAN;
+
       await this.veterinarianRepository.save(veterinarian);
 
       return veterinarian;
@@ -49,8 +47,20 @@ export class VeterinarianService {
     throw new InternalServerErrorException('Please check server logs');
   }
 
-  findAll() {
-    return `This action returns all veterinarian`;
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
+    const veterinarians = await this.veterinarianRepository.find({
+      take: limit,
+      skip: offset,
+      relations: {
+        user: true,
+      },
+    });
+
+    veterinarians.forEach(({ user }) => delete user.userId);
+
+    return veterinarians;
   }
 
   findOne(id: number) {
