@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -20,7 +20,6 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly datasource: DataSource
   ) {}
   async register(createUserDto: CreateUserDto) {
     try {
@@ -40,8 +39,6 @@ export class AuthService {
       this.handleDBErrors(error);
     }
   }
-
- 
 
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
@@ -76,7 +73,7 @@ export class AuthService {
       skip: offset,
     });
 
-    if(!users) throw new NotFoundException('users have not been found')
+    if (!users) throw new NotFoundException('users have not been found');
     return users;
   }
 
@@ -91,38 +88,35 @@ export class AuthService {
     return product;
   }
 
-  async update(id: string, updateUserDto:UpdateUserDto ){
-
-    const { ...rest } = updateUserDto
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const { ...rest } = updateUserDto;
 
     try {
       const user = await this.userRepository.preload({
         userId: id,
-        ...rest
-      })
-  
-      if(!user) throw new NotFoundException(`Product with id ${id} not found`)
+        ...rest,
+      });
 
-      await this.userRepository.save(user)
+      if (!user) throw new NotFoundException(`Product with id ${id} not found`);
 
-      return user
-      
+      await this.userRepository.save(user);
+
+      return user;
     } catch (error) {
-      this.handleDBErrors(error)
+      this.handleDBErrors(error);
     }
   }
 
   async desactivateUser(id: string) {
     const user = await this.findOne(id);
-  
+
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
-  
+
     user.isActive = false;
     await this.userRepository.save(user);
-  
-    return { message:  `user ${user.fullName} has been desactivated`};
+
+    return { message: `user ${user.fullName} has been desactivated` };
   }
-  
 
   private handleDBErrors(error: any): never {
     if (error.code === '23505') {
@@ -131,6 +125,4 @@ export class AuthService {
     console.log(error);
     throw new InternalServerErrorException('Please check server logs');
   }
-
-
 }

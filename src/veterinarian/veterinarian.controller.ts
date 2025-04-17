@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { VeterinarianService } from './veterinarian.service';
 import { CreateVeterinarianDto } from './dto/create-veterinarian.dto';
 import { UpdateVeterinarianDto } from './dto/update-veterinarian.dto';
@@ -24,13 +33,16 @@ export class VeterinarianController {
 
   @Get()
   @Auth()
-  findAll(@Query() paginationDto: PaginationDto){
-    return this.veterinarianService.findAll(paginationDto)
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.veterinarianService.findAll(paginationDto);
   }
 
   @Patch(':id')
   @Auth()
-  update(@Param('id') id: string, @Body() updateVeterinarianDto: UpdateVeterinarianDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVeterinarianDto: UpdateVeterinarianDto,
+  ) {
     return this.veterinarianService.update(+id, updateVeterinarianDto);
   }
 
