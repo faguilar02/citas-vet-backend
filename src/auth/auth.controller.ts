@@ -13,7 +13,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto, PaginationDto, UpdateUserDto } from './dto';
+import {
+  CreateUserDto,
+  LoginUserDto,
+  PaginationDto,
+  UpdateUserDto,
+} from './dto';
 import { AuthGuard } from '@nestjs/passport';
 
 import { User } from './entities/user.entity';
@@ -38,25 +43,28 @@ export class AuthController {
   @Auth(UserRole.ADMIN)
   @Get('users')
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.authService.findAll(paginationDto)
+    return this.authService.findAll(paginationDto);
   }
 
   @Get(':id')
   @Auth()
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.authService.findOne(id)
+    return this.authService.findOne(id);
   }
 
   @Patch(':id')
   @Auth()
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.authService.update(id, updateUserDto)
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.authService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @Auth(UserRole.ADMIN)
-  desactivateUser(@Param('id', ParseUUIDPipe) id:string){
-    return this.authService.desactivateUser(id)
+  desactivateUser(@Param('id', ParseUUIDPipe) id: string) {
+    return this.authService.desactivateUser(id);
   }
 
   // @Get('private')

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { VeterinarianModule } from './veterinarian/veterinarian.module';
+import { BaseDispoModule } from './base-dispo/base-dispo.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { VeterinarianModule } from './veterinarian/veterinarian.module';
     }),
     AuthModule,
     VeterinarianModule,
+    BaseDispoModule,
   ],
   controllers: [],
   providers: [],
