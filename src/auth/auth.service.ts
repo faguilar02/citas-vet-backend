@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -21,7 +21,7 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto, manager?: EntityManager) {
     try {
       const { password, ...userData } = createUserDto;
       const user = this.userRepository.create({
@@ -29,6 +29,7 @@ export class AuthService {
         password: bcrypt.hashSync(password, 10),
       });
 
+      if(manager) return await manager.save(user)
       await this.userRepository.save(user);
       delete user.password;
       return {

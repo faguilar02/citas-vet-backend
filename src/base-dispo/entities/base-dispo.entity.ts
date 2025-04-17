@@ -1,16 +1,18 @@
 import { Veterinarian } from "src/veterinarian/entities/veterinarian.entity";
-import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { DaysOfWeek } from "../models/enums/days-of-week.enum";
 
 @Entity({name:'base-disponibility'})
 export class BaseDispo {
 
-    @PrimaryColumn('uuid')
-    id: string
+    @PrimaryGeneratedColumn()
+    id: number
 
-    @ManyToOne(() => Veterinarian, (veterinarian) => veterinarian.baseDisponibility, {
-        onDelete: 'CASCADE'
-    })
+    @Column('uuid')
+    veterinarianId: string
+    
+    @ManyToOne(() => Veterinarian, v => v.baseDisponibility, {onDelete: 'CASCADE'} )
+    @JoinColumn({ name: 'veterinarianId' , referencedColumnName: 'id'})
     veterinarian: Veterinarian
 
     @Column({type: 'enum', enum: DaysOfWeek })

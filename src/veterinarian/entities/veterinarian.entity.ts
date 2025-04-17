@@ -18,7 +18,7 @@ export class Veterinarian {
   @OneToMany( () => BaseDispo, (baseDispo) => baseDispo.veterinarian, {
     cascade: true, eager: true
   })
-  baseDisponibility?: BaseDispo
+  baseDisponibility?: BaseDispo[]
 
 }
 
