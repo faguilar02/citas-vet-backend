@@ -1,20 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { BaseDispoService } from './base-dispo.service';
-import { CreateBaseDispoDto } from './dto/create-base-dispo.dto';
 import { UpdateBaseDispoDto } from './dto/update-base-dispo.dto';
+import { DaysOfWeek } from './models/enums/days-of-week.enum';
 
 @Controller('base-dispo')
 export class BaseDispoController {
   constructor(private readonly baseDispoService: BaseDispoService) {}
 
-  @Post()
-  create(@Body() createBaseDispoDto: CreateBaseDispoDto) {
-    return this.baseDispoService.create(createBaseDispoDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.baseDispoService.findAll();
+  @Get(':vetId')
+  findSlotsByVetAndDay(@Param('vetId') vetId: string, @Query('day') day:DaysOfWeek) {
+    return this.baseDispoService.findSlotsByVetAndDay(vetId, day);
   }
 
   @Get(':id')
