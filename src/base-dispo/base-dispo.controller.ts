@@ -12,10 +12,6 @@ export class BaseDispoController {
     return this.baseDispoService.findSlotsByVetAndDay(vetId, day);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.baseDispoService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBaseDispoDto: UpdateBaseDispoDto) {
@@ -24,6 +20,6 @@ export class BaseDispoController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.baseDispoService.remove(+id);
+    return this.baseDispoService.desactiveSlot(+id);
   }
 }

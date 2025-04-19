@@ -4,9 +4,12 @@ import { UpdateBaseDispoDto } from './dto/update-base-dispo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseDispo } from './entities/base-dispo.entity';
 import { Repository } from 'typeorm';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DaysOfWeek } from './models/enums/days-of-week.enum';
-
 
 @Injectable()
 export class BaseDispoService {
@@ -17,7 +20,7 @@ export class BaseDispoService {
 
   async findSlotsByVetAndDay(vetId: string, day: DaysOfWeek) {
     const franja = await this.baseDispoRepository.findOne({
-      where: { veterinarianId: vetId, dayOfWeek: day },
+      where: { veterinarianId: vetId, dayOfWeek: day, isActive: true },
       select: { startTime: true, endTime: true },
     });
 
@@ -29,15 +32,15 @@ export class BaseDispoService {
   }
 
   generarSlotsPorFranja(startTime: string, endTime: string) {
-   
-    const slots: string[] = []; // acá guardaremos cada hora generada como string 
+    const slots: string[] = []; // acá guardaremos cada hora generada como string
 
     const formato = 'HH:mm:ss'; // este será el formato de 24 horas (hora, minuto , segundo) tal cual está en nuestra bd
- 
+
     let start = parse(startTime, formato, new Date()); // este parse convierte ese string en un Date con ese mismo formato
     const end = parse(endTime, formato, new Date()); // acá lo mismo
 
-    while (isBefore(start, end)) { // ahora que ya son Date ya podemos comparar por eso usamos el isBefore, mientras start sea menor que end se agregará ese valor al array
+    while (isBefore(start, end)) {
+      // ahora que ya son Date ya podemos comparar por eso usamos el isBefore, mientras start sea menor que end se agregará ese valor al array
       slots.push(format(start, 'HH:mm')); // se agrega al array y se le cambia el formato a horas y minutos
       start = addMinutes(start, 60); // se le agrega 1 hora a la hora inicial anterior y se vuelve a repetir todo
     }
@@ -45,13 +48,31 @@ export class BaseDispoService {
     return slots;
   }
 
+  async update(id: number, updateBaseDispoDto: UpdateBaseDispoDto) {
+    const baseDispo = await this.baseDispoRepository.preload({
+      id: id,
+      ...updateBaseDispoDto,
+    });
 
+    if (!baseDispo) throw new NotFoundException(`Slot with id ${id} not found`);
 
-  update(id: number, updateBaseDispoDto: UpdateBaseDispoDto) {
-    return `This action updates a #${id} baseDispo`;
+    await this.baseDispoRepository.save(baseDispo);
+
+    return baseDispo;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} baseDispo`;
+  async desactiveSlot(id: number) {
+    const slot = await this.baseDispoRepository.findOne({ where: { id } });
+
+    if (!slot) throw new NotFoundException(`slot with id ${id} not found`);
+
+    slot.isActive = false;
+    await this.baseDispoRepository.save(slot);
+
+    const { dayOfWeek, startTime, endTime } = slot;
+
+    return {
+      message: `${dayOfWeek} : ${startTime} - ${endTime} have been desactivated`,
+    };
   }
 }
