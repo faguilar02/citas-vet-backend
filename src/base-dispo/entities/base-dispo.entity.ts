@@ -25,6 +25,7 @@ export class BaseDispo {
     endTime: string
 
 
-
+    @Column('bool', {default: true})
+    isActive: boolean
 
 }

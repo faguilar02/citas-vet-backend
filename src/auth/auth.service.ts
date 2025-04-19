@@ -29,7 +29,7 @@ export class AuthService {
         password: bcrypt.hashSync(password, 10),
       });
 
-      if(manager) return await manager.save(user)
+      if (manager) return await manager.save(user);
       await this.userRepository.save(user);
       delete user.password;
       return {

@@ -35,23 +35,15 @@ export class VeterinarianService {
 
       const veterinarian = this.veterinarianRepository.create({
         specialty,
+        baseDisponibility: baseDisponibility.map((item) =>
+          this.baseDispoRepository.create({ ...item }),
+        ),
         user: await this.authService.register(userData, queryRunner.manager),
       });
 
       veterinarian.user.role = UserRole.VETERINARIAN;
 
       await queryRunner.manager.save(veterinarian);
-
-      if (baseDisponibility && baseDisponibility.length > 0) {
-        const baseDisponibiltyEntities = this.baseDispoRepository.create(
-          baseDisponibility.map((item) => ({
-            veterinarianId: veterinarian.id,
-            ...item,
-          })),
-        );
-
-        await queryRunner.manager.save(baseDisponibiltyEntities);
-      }
 
       await queryRunner.commitTransaction();
       const savedVeterinarian = await this.veterinarianRepository.findOne({
