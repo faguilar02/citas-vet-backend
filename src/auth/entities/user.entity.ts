@@ -4,10 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../models/enums/user-role.enum';
+import { Pet } from 'src/pets/entities/pet.entity';
 
 @Entity('users')
 export class User {
@@ -25,6 +27,9 @@ export class User {
 
   @Column('bool', { default: true })
   isActive: boolean;
+
+  @OneToMany( () => Pet, p => p.owner , { cascade: true, eager: true})
+  pet: Pet[]
 
   @CreateDateColumn({type: 'timestamptz', nullable: false})
   createdAt: Date;

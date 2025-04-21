@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { VeterinarianModule } from './veterinarian/veterinarian.module';
 import { BaseDispoModule } from './base-dispo/base-dispo.module';
+import { PetsModule } from './pets/pets.module';
 
 
 @Module({
@@ -23,6 +24,7 @@ import { BaseDispoModule } from './base-dispo/base-dispo.module';
     AuthModule,
     VeterinarianModule,
     BaseDispoModule,
+    PetsModule,
   ],
   controllers: [],
   providers: [],

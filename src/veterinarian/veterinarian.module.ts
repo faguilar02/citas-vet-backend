@@ -12,6 +12,6 @@ import { BaseDispo } from 'src/base-dispo/entities/base-dispo.entity';
 @Module({
   imports: [AuthModule, TypeOrmModule.forFeature([Veterinarian, BaseDispo])],
   controllers: [VeterinarianController],
-  providers: [VeterinarianService, AuthService, BaseDispoService],
+  providers: [VeterinarianService, AuthService],
 })
 export class VeterinarianModule {}
