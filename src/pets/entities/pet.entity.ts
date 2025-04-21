@@ -7,11 +7,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Species } from '../models/enums/species.enum';
+import { Unit } from '../models/enums/unit.enum';
 
-enum Species {
-  CAT = 'cat',
-  DOG = 'dog',
-}
 @Entity({ name: 'pets' })
 export class Pet {
   @PrimaryGeneratedColumn('uuid')
@@ -28,14 +26,18 @@ export class Pet {
   name: string;
 
   @Column({ type: 'enum', enum: Species })
-  species: Species;
+  specie: Species;
 
-  @Column('text')
+  @Column({ type: 'text', nullable: true })
   race: string;
 
-  @Column('text')
+  @Column({ type: 'text', nullable: true })
   age: string;
 
-  @Column({ type: 'numeric', precision: 4, scale: 1 })
+  @Column({ type: 'numeric', precision: 4, scale: 1, nullable: true })
   weight: number;
+
+  @Column({type: 'enum', enum: Unit, nullable: true})
+  unit: Unit
+
 }
