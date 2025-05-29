@@ -61,7 +61,7 @@ export class BaseDispoService {
     return baseDispo;
   }
 
-  async desactiveSlot(id: number) {
+  async disableSlot(id: number) {
     const slot = await this.baseDispoRepository.findOne({ where: { id } });
 
     if (!slot) throw new NotFoundException(`slot with id ${id} not found`);

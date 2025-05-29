@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Species } from '../models/enums/species.enum';
 import { Unit } from '../models/enums/unit.enum';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Entity({ name: 'pets' })
 export class Pet {
@@ -21,6 +22,9 @@ export class Pet {
   @ManyToOne(() => User, (u) => u.userId, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'userId' })
   owner: User;
+
+  @OneToMany( () => Appointment, ap => ap.pet , {cascade: true, eager: true})
+  appointment: Appointment[]
 
   @Column('text')
   name: string;

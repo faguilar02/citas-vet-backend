@@ -5,6 +5,9 @@ import { AuthModule } from './auth/auth.module';
 import { VeterinarianModule } from './veterinarian/veterinarian.module';
 import { BaseDispoModule } from './base-dispo/base-dispo.module';
 import { PetsModule } from './pets/pets.module';
+import { MedicalHistoryModule } from './medical-history/medical-history.module';
+import { AppointmentModule } from './appointment/appointment.module';
+import { AppointmentDetailsModule } from './appointment-details/appointment-details.module';
 
 
 @Module({
@@ -25,6 +28,9 @@ import { PetsModule } from './pets/pets.module';
     VeterinarianModule,
     BaseDispoModule,
     PetsModule,
+    MedicalHistoryModule,
+    AppointmentModule,
+    AppointmentDetailsModule,
   ],
   controllers: [],
   providers: [],
