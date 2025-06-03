@@ -15,11 +15,11 @@ export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'time' })
-  startTime: string;
+  @Column({ type: 'date' })
+  date: Date;
 
   @Column({ type: 'time' })
-  endTime: string;
+  startTime: string;
 
   @Column({ type: 'text' })
   service: string;
@@ -27,7 +27,7 @@ export class Appointment {
   @Column({
     type: 'enum',
     enum: AppointmentState,
-    default: AppointmentState.PENDING,
+    default: AppointmentState.CONFIRMED,
   })
   state: AppointmentState;
 
