@@ -9,17 +9,18 @@ import {
 import { AppointmentState } from '../models/enums/appointment-state.enum';
 import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
 import { Pet } from 'src/pets/entities/pet.entity';
+import { Veterinarian } from 'src/veterinarian/entities/veterinarian.entity';
 
 @Entity({ name: 'appointment' })
 export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'date' })
-  date: Date;
-
   @Column({ type: 'time' })
   startTime: string;
+
+  @Column({ type: 'date' })
+  date: Date;
 
   @Column({ type: 'text' })
   service: string;
@@ -34,13 +35,19 @@ export class Appointment {
   @Column('uuid')
   medicalHistoryId: string;
   @Column('uuid')
-  petId:string
+  petId: string;
+  @Column('uuid')
+  veterinarianId: string
 
   @ManyToOne(() => MedicalHistory, (mh) => mh.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'medicalHistoryId', referencedColumnName: 'id' })
   medicalHistory: MedicalHistory;
 
-  @ManyToOne( () => Pet, p => p.id, {onDelete: 'CASCADE'})
-  @JoinColumn({name: 'petId', referencedColumnName: 'id' })
-  pet: Pet
+  @ManyToOne(() => Pet, (p) => p.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'petId', referencedColumnName: 'id' })
+  pet: Pet;
+
+  @ManyToOne( () => Veterinarian, (v) => v.id , { onDelete: 'CASCADE'})
+  @JoinColumn({name: 'veterinarianId', referencedColumnName: 'id' })
+  veterinarian: Veterinarian
 }

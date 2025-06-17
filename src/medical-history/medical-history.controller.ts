@@ -18,8 +18,8 @@ export class MedicalHistoryController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicalHistoryService.findOne(+id);
+  findOneByPetId(@Param('id') id: string) {
+    return this.medicalHistoryService.findOneByPetId(id);
   }
 
   @Patch(':id')

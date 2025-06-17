@@ -2,6 +2,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { VeterinarySpecialty } from '../models/enums/veterinarian-specialty.enum';
 import { BaseDispo } from 'src/base-dispo/entities/base-dispo.entity';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Entity({ name: 'veterinarian' })
 export class Veterinarian {
@@ -20,5 +21,11 @@ export class Veterinarian {
   })
   baseDisponibility?: BaseDispo[]
 
+
+  @OneToMany(() => Appointment, (a) => a.veterinarian, {
+      cascade: true,
+      eager: true,
+    })
+    appointment: Appointment[];
 }
 
