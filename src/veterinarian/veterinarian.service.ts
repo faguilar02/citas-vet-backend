@@ -2,17 +2,19 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateVeterinarianDto } from './dto/create-veterinarian.dto';
 import { UpdateVeterinarianDto } from './dto/update-veterinarian.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Veterinarian } from './entities/veterinarian.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { UserRole } from 'src/auth/models/enums';
 import { PaginationDto } from 'src/auth/dto/pagination.dto';
 import { BaseDispoService } from 'src/base-dispo/base-dispo.service';
 import { BaseDispo } from 'src/base-dispo/entities/base-dispo.entity';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class VeterinarianService {
@@ -91,8 +93,20 @@ export class VeterinarianService {
     return veterinarians;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} veterinarian`;
+  async findOne(id: string, manager?: EntityManager) {
+    if (!isUUID(id)) throw new BadRequestException('id not found');
+
+    let veterinarian: Veterinarian;
+
+    if (manager) {
+      veterinarian = await manager.findOne(Veterinarian, { where: { id } });
+    } else {
+      veterinarian = await this.veterinarianRepository.findOneBy({ id });
+    }
+
+    if (!veterinarian) throw new NotFoundException('veterinarian not found');
+
+    return veterinarian;
   }
 
   update(id: number, updateVeterinarianDto: UpdateVeterinarianDto) {

@@ -6,8 +6,9 @@ import { Pet } from './entities/pet.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pet]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Pet]), AuthModule], // este auth module es para poner los decoradores en el controller
   controllers: [PetsController],
   providers: [PetsService],
+  exports: [PetsService, TypeOrmModule]
 })
 export class PetsModule {}

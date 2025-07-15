@@ -8,7 +8,7 @@ import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pet } from './entities/pet.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { PaginationDto } from 'src/auth/dto';
 import { isUUID } from 'class-validator';
 
@@ -45,20 +45,35 @@ export class PetsService {
     });
 
     if (!pets) throw new NotFoundException('pets have been not found');
-    return pets;
+    
+    pets.forEach( (p) => delete p.appointment)
+    return pets
   }
 
-  async findOne(id: string, userId: string): Promise<Pet> {
+  async findOneByIdAndOwner(
+    id: string,
+    userId: string,
+    manager?: EntityManager,
+  ): Promise<Pet> {
     if (!isUUID(id))
       throw new BadRequestException('id not valid (it must be a UUID)');
-    const pet = await this.petsRepository.findOne({
-      where: {
-        id,
-        ownerId: userId,
-      },
-    });
 
-    if (!pet) throw new BadRequestException(`pet was not found`);
+    const conditions = {
+      id,
+      ownerId: userId,
+    };
+
+    let pet: Pet;
+
+    if (!manager) {
+      pet = await this.petsRepository.findOne({
+        where: conditions,
+      });
+    } else {
+      pet = await manager.findOne(Pet, { where: conditions });
+    }
+
+    if (!pet) throw new NotFoundException(`pet was not found`);
 
     return pet;
   }
@@ -70,28 +85,23 @@ export class PetsService {
       ...updatePetDto,
     });
 
-    if(!pet) throw new NotFoundException(`pet was not found`)
+    if (!pet) throw new NotFoundException(`pet was not found`);
 
-    await this.petsRepository.save(pet)
+    await this.petsRepository.save(pet);
 
-    return pet
+    return pet;
   }
 
   async remove(id: string, userId: string) {
+    if (!isUUID(id))
+      throw new BadRequestException('id not valid (it must be UUID)');
 
-    if(!isUUID(id)) throw new BadRequestException('id not valid (it must be UUID)')
-    
-    const pet = await this.findOne(id, userId)
+    const pet = await this.findOneByIdAndOwner(id, userId);
 
-    if(!pet) throw new NotFoundException('pet was not found')
+    if (!pet) throw new NotFoundException('pet was not found');
 
-    this.petsRepository.remove(pet)
+    this.petsRepository.remove(pet);
 
-    return 'pet was deleted'
-
+    return 'pet was deleted';
   }
-
-
 }
-
-

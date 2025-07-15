@@ -2,14 +2,25 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { Auth, GetUser } from 'src/auth/decorators';
+
+
+interface FindOptions {
+  veterinarianId :string
+  startTime:string
+  date:string
+  petId:string
+
+}
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
+  @Auth()
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentService.create(createAppointmentDto);
+  create(@Body() createAppointmentDto: CreateAppointmentDto, @GetUser('userId') userId: string) {
+    return this.appointmentService.create(createAppointmentDto, userId);
   }
 
   @Get()
@@ -17,10 +28,12 @@ export class AppointmentController {
     return this.appointmentService.findAll();
   }
 
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.appointmentService.findOne(+id);
+    return this.appointmentService.findOne(id);
   }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {

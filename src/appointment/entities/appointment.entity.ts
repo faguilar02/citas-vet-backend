@@ -50,4 +50,7 @@ export class Appointment {
   @ManyToOne( () => Veterinarian, (v) => v.id , { onDelete: 'CASCADE'})
   @JoinColumn({name: 'veterinarianId', referencedColumnName: 'id' })
   veterinarian: Veterinarian
+
+
+  
 }
