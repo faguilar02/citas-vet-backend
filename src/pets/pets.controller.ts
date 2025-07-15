@@ -26,7 +26,7 @@ export class PetsController {
   @Auth()
   @Get(':id')
   findOne(@Param('id') id: string , @GetUser('userId') userId: string) {
-    return this.petsService.findOne(id, userId);
+    return this.petsService.findOneByIdAndOwner(id, userId);
   }
 
   @Auth()

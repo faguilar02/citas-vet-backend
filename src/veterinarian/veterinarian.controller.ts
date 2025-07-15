@@ -28,7 +28,7 @@ export class VeterinarianController {
   @Get(':id')
   @Auth()
   findOne(@Param('id') id: string) {
-    return this.veterinarianService.findOne(+id);
+    return this.veterinarianService.findOne(id);
   }
 
   @Get()

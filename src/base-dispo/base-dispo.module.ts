@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   controllers: [BaseDispoController],
   providers: [BaseDispoService],
-  imports: [TypeOrmModule.forFeature([BaseDispo]), AuthModule]
+  imports: [TypeOrmModule.forFeature([BaseDispo]), AuthModule],
+  exports: [BaseDispoService, TypeOrmModule]
 })
 export class BaseDispoModule {}

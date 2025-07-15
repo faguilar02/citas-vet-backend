@@ -3,7 +3,7 @@ import { addMinutes, format, isBefore, parse } from 'date-fns';
 import { UpdateBaseDispoDto } from './dto/update-base-dispo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseDispo } from './entities/base-dispo.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import {
   BadRequestException,
   Injectable,
@@ -18,11 +18,23 @@ export class BaseDispoService {
     private readonly baseDispoRepository: Repository<BaseDispo>,
   ) {}
 
-  async findSlotsByVetAndDay(vetId: string, day: DaysOfWeek) {
-    const franja = await this.baseDispoRepository.findOne({
+  async findSlotsByVetAndDay(
+    vetId: string,
+    day: DaysOfWeek,
+    manager?: EntityManager,
+  ): Promise<string[]> {
+    let franja: BaseDispo;
+
+    const conditions = {
       where: { veterinarianId: vetId, dayOfWeek: day, isActive: true },
       select: { startTime: true, endTime: true },
-    });
+    };
+
+    if (manager) {
+      franja = await manager.findOne(BaseDispo, conditions);
+    } else {
+      franja = await this.baseDispoRepository.findOne(conditions);
+    }
 
     if (!franja) throw new BadRequestException('slots not found');
 

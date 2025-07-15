@@ -7,6 +7,7 @@ import { MedicalHistory } from './entities/medical-history.entity';
 @Module({
   controllers: [MedicalHistoryController],
   providers: [MedicalHistoryService],
-  imports: [TypeOrmModule.forFeature([MedicalHistory])]
+  imports: [TypeOrmModule.forFeature([MedicalHistory])],
+  exports: [MedicalHistoryService, TypeOrmModule]
 })
 export class MedicalHistoryModule {}

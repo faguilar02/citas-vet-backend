@@ -3,12 +3,22 @@ import { AppointmentService } from './appointment.service';
 import { AppointmentController } from './appointment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Appointment } from './entities/appointment.entity';
-import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
-import { MedicalHistoryService } from 'src/medical-history/medical-history.service';
+import { MedicalHistoryModule } from '../medical-history/medical-history.module';
+import { VeterinarianModule } from '../veterinarian/veterinarian.module';
+import { PetsModule } from 'src/pets/pets.module';
+import { AuthModule } from '../auth/auth.module';
+import { BaseDispoModule } from 'src/base-dispo/base-dispo.module';
 
 @Module({
   controllers: [AppointmentController],
-  providers: [AppointmentService, MedicalHistoryService],
-  imports: [TypeOrmModule.forFeature([Appointment, MedicalHistory])]
+  providers: [AppointmentService],
+  imports: [
+    AuthModule,
+    MedicalHistoryModule,
+    VeterinarianModule,
+    PetsModule,
+    BaseDispoModule,
+    TypeOrmModule.forFeature([Appointment]),
+  ],
 })
 export class AppointmentModule {}
