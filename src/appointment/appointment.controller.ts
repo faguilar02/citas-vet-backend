@@ -1,17 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
+import { AppointmentState } from './models/enums/appointment-state.enum';
 
 
-interface FindOptions {
-  veterinarianId :string
-  startTime:string
-  date:string
-  petId:string
-
-}
 
 @Controller('appointment')
 export class AppointmentController {
@@ -27,14 +21,17 @@ export class AppointmentController {
   findAll() {
     return this.appointmentService.findAll();
   }
+  
 
 
+  @Auth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appointmentService.findOne(id);
+  findAppointmentsByPet(@Param('id') petId:string , @Query('state') state?:AppointmentState){
+    console.log(state)
+    return this.appointmentService.findAppointmentsByPet(petId, state)
+
   }
-
-
+  
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {
     return this.appointmentService.update(+id, updateAppointmentDto);
