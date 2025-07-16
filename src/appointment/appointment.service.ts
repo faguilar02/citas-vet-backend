@@ -148,10 +148,6 @@ export class AppointmentService {
     }
   }
 
-  findAll() {
-    return `This action returns all appointment`;
-  }
-
   async findAppointmentByVet(
     veterinarianId: string,
     startTime: string,
@@ -186,7 +182,27 @@ export class AppointmentService {
     return appointmentPetDB;
   }
 
-  findOne(id: string) {}
+  findAll() {
+    return `This action returns all appointment`;
+  }
+
+  async findAppointmentsByPet(petId: string, state?: AppointmentState) {
+    const whereConditions: any = { petId };
+
+    if (state) whereConditions.state = state;
+
+    const appointments = await this.appointmentRepository.find({
+      where: whereConditions,
+    });
+
+    if (appointments.length === 0) {
+      throw new NotFoundException(
+        'No appointments found for this pet and state',
+      );
+    }
+
+    return appointments;
+  }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
     return `This action updates a #${id} appointment`;
