@@ -14,6 +14,7 @@ import { PetsService } from 'src/pets/pets.service';
 import { BaseDispoService } from 'src/base-dispo/base-dispo.service';
 import { DaysOfWeek } from 'src/base-dispo/models/enums/days-of-week.enum';
 import { AppointmentState } from './models/enums/appointment-state.enum';
+import { query } from 'express';
 
 @Injectable()
 export class AppointmentService {
@@ -33,6 +34,7 @@ export class AppointmentService {
     // query builder que reciba el createAppointmentDto
 
     console.log('datos recibidos para crear cita:', createAppointmentDto);
+    console.log({ userId });
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -66,7 +68,7 @@ export class AppointmentService {
       // verificar que el veterinario tenga disponibilidad esa fecha
 
       const dateBD = new Date(date);
-      const dayOfWeek = dateBD.getDay();
+      const dayOfWeek = dateBD.getDay() + 1;
 
       const days = [
         'Sunday' as DaysOfWeek,
@@ -186,22 +188,57 @@ export class AppointmentService {
     return `This action returns all appointment`;
   }
 
-  async findAppointmentsByPet(petId: string, state?: AppointmentState) {
-    const whereConditions: any = { petId };
+  async findAppointmentsByPet(
+    petId: string,
+    userId: string,
+    state?: AppointmentState,
+  ) {
+    const queryBuilder = this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .leftJoinAndSelect('appointment.pet', 'pet')
+      .where('appointment.petId = :petId', { petId })
+      .andWhere('pet.ownerId = :userId', { userId }); // Verificar ownership
 
-    if (state) whereConditions.state = state;
-
-    const appointments = await this.appointmentRepository.find({
-      where: whereConditions,
-    });
-
-    if (appointments.length === 0) {
-      throw new NotFoundException(
-        'No appointments found for this pet and state',
-      );
+    if (state) {
+      queryBuilder.andWhere('appointment.state = :state', { state });
     }
 
+    const appointments = await queryBuilder.getMany();
+
+    if (appointments.length === 0) {
+      throw new NotFoundException('No appointments found');
+    }
+
+    return appointments.map((a) => {
+      delete a.pet.appointment;
+      return a;
+    });
+  }
+
+  async findAppointmentsByOwnerId(userId: string, last?: number) {
+    const queryBuilder = this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .leftJoinAndSelect('appointment.pet', 'pet')
+      .where('pet.ownerId = :userId', { userId });
+
+    const appointments = await queryBuilder.getMany();
+
+    if (appointments.length === 0)
+      throw new NotFoundException('No appointments found');
+
+    if (last) return appointments.slice(-last).reverse();
+
     return appointments;
+  }
+
+  async findOne(id:string){
+
+    const appoinment = await this.appointmentRepository.findOneBy({id})
+
+    if(!appoinment) throw new NotFoundException('appointment not found')
+
+    return appoinment
+
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {

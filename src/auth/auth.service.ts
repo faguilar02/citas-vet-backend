@@ -41,6 +41,20 @@ export class AuthService {
     }
   }
 
+  async changePassword(userId: string, newPassword:string){
+    const user = await this.findOne(userId)
+
+    if(!user) throw new NotFoundException('user not found')
+
+    const newUser = {
+      ...user, password: bcrypt.hashSync(newPassword, 10)
+
+    }
+    await this.userRepository.save(newUser)
+
+    return newUser
+  }
+
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
 
@@ -82,11 +96,11 @@ export class AuthService {
     if (!isUUID(id))
       throw new BadRequestException('id not valid (it must be a UUID)');
 
-    const product = await this.userRepository.findOneBy({ userId: id });
+    const user = await this.userRepository.findOneBy({ userId: id });
 
-    if (!product) throw new BadRequestException('user not found');
+    if (!user) throw new BadRequestException('user not found');
 
-    return product;
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
