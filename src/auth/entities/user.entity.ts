@@ -28,7 +28,7 @@ export class User {
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @OneToMany( () => Pet, p => p.owner , { cascade: true, eager: true})
+  @OneToMany( () => Pet, p => p.owner , { cascade: true})
   pet: Pet[]
 
   @CreateDateColumn({type: 'timestamptz', nullable: false})

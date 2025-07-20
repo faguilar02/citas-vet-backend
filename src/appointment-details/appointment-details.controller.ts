@@ -2,24 +2,27 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AppointmentDetailsService } from './appointment-details.service';
 import { CreateAppointmentDetailDto } from './dto/create-appointment-detail.dto';
 import { UpdateAppointmentDetailDto } from './dto/update-appointment-detail.dto';
+import { Auth, GetUser } from 'src/auth/decorators';
+import { UserRole } from 'src/auth/models/enums';
 
 @Controller('appointment-details')
 export class AppointmentDetailsController {
   constructor(private readonly appointmentDetailsService: AppointmentDetailsService) {}
 
+  @Auth(UserRole.VETERINARIAN)
   @Post()
-  create(@Body() createAppointmentDetailDto: CreateAppointmentDetailDto) {
-    return this.appointmentDetailsService.create(createAppointmentDetailDto);
+  create(@Body() createAppointmentDetailDto: CreateAppointmentDetailDto, @GetUser('userId') userId:string) {
+    return this.appointmentDetailsService.create(createAppointmentDetailDto, userId);
   }
 
-  @Get()
-  findAll() {
-    return this.appointmentDetailsService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.appointmentDetailsService.findAll();
+  // }
 
-  @Get(':id')
+  @Get('appointment/:id')
   findOne(@Param('id') id: string) {
-    return this.appointmentDetailsService.findOne(+id);
+    return this.appointmentDetailsService.getDetailsByAppoinment(id);
   }
 
   @Patch(':id')

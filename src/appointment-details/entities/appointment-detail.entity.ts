@@ -22,9 +22,10 @@ export class AppointmentDetail {
   @Column({ type: 'text' })
   treatment: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text'})
   notes: string;
-  @OneToOne(() => Appointment, { cascade: true, eager: true })
+
+  @OneToOne(() => Appointment, { cascade: true})
   @JoinColumn({ name: 'appointmentId', referencedColumnName: 'id' })
   appointment: Appointment;
 }

@@ -20,5 +20,7 @@ import { BaseDispoModule } from 'src/base-dispo/base-dispo.module';
     BaseDispoModule,
     TypeOrmModule.forFeature([Appointment]),
   ],
+
+  exports: [AppointmentService, TypeOrmModule]
 })
 export class AppointmentModule {}
