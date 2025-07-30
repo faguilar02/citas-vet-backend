@@ -27,20 +27,32 @@ export class VeterinarianService {
     private readonly veterinarianRepository: Repository<Veterinarian>,
   ) {}
 
-  async create(createVeterinarianDto: CreateVeterinarianDto) {
+  async create(
+    createVeterinarianDto: CreateVeterinarianDto,
+    secure_url?: string,
+    public_id?: string,
+  ) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const { specialty, baseDisponibility, ...userData } =
+      const { specialty, baseDisponibility,services, experienceDescription, workPlace, ...userData } =
         createVeterinarianDto;
 
       const veterinarian = this.veterinarianRepository.create({
         specialty,
+        services,
+        experienceDescription, 
+        workPlace,
         baseDisponibility: baseDisponibility.map((item) =>
           this.baseDispoRepository.create({ ...item }),
         ),
-        user: await this.authService.register(userData, queryRunner.manager),
+        user: await this.authService.register(
+          userData,
+          secure_url,
+          public_id,
+          queryRunner.manager,
+        ),
       });
 
       veterinarian.user.role = UserRole.VETERINARIAN;

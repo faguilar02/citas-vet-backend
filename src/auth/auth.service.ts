@@ -21,12 +21,19 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
-  async register(createUserDto: CreateUserDto, manager?: EntityManager) {
+  async register(
+    createUserDto: CreateUserDto,
+    secure_url?: string,
+    public_id?: string,
+    manager?: EntityManager,
+  ) {
     try {
       const { password, ...userData } = createUserDto;
       const user = this.userRepository.create({
         ...userData,
         password: bcrypt.hashSync(password, 10),
+        secure_url, 
+        public_id
       });
 
       if (manager) return await manager.save(user);
@@ -41,18 +48,18 @@ export class AuthService {
     }
   }
 
-  async changePassword(userId: string, newPassword:string){
-    const user = await this.findOne(userId)
+  async changePassword(userId: string, newPassword: string) {
+    const user = await this.findOne(userId);
 
-    if(!user) throw new NotFoundException('user not found')
+    if (!user) throw new NotFoundException('user not found');
 
     const newUser = {
-      ...user, password: bcrypt.hashSync(newPassword, 10)
+      ...user,
+      password: bcrypt.hashSync(newPassword, 10),
+    };
+    await this.userRepository.save(newUser);
 
-    }
-    await this.userRepository.save(newUser)
-
-    return newUser
+    return newUser;
   }
 
   async login(loginUserDto: LoginUserDto) {

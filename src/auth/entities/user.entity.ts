@@ -15,8 +15,25 @@ import { Pet } from 'src/pets/entities/pet.entity';
 export class User {
   @PrimaryGeneratedColumn('uuid')
   userId: string;
+  @Column('text', {nullable: true})
+  secure_url: string;
+  @Column('text', {nullable: true})
+  public_id: string;
+
   @Column('text')
   fullName: string;
+  @Column({
+    nullable: true,
+    length: 9,
+  })
+  phoneNumber: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  address: string;
+
   @Column('text', { unique: true })
   email: string;
   @Column('text', { select: false })
@@ -28,13 +45,13 @@ export class User {
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @OneToMany( () => Pet, p => p.owner , { cascade: true})
-  pet: Pet[]
+  @OneToMany(() => Pet, (p) => p.owner, { cascade: true })
+  pet: Pet[];
 
-  @CreateDateColumn({type: 'timestamptz', nullable: false})
+  @CreateDateColumn({ type: 'timestamptz', nullable: false })
   createdAt: Date;
 
-  @UpdateDateColumn({type: 'timestamptz' , nullable: true})
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
   updatedAt: Date;
 
   @BeforeInsert()
