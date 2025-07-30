@@ -29,8 +29,8 @@ export class AppointmentController {
 
   @Auth()
   @Get()
-  findAll(@GetUser('userId') userId: string, @Query('last') last?: string) {
-    return this.appointmentService.findAppointmentsByOwnerId(userId, +last);
+  findAll(@GetUser('userId') userId: string, @Query('state') state?: string, @Query('last') last?: string) {
+    return this.appointmentService.findAppointmentsByOwnerId(userId, state, +last);
   }
 
   @Auth()
@@ -44,18 +44,25 @@ export class AppointmentController {
     return this.appointmentService.findAppointmentsByPet(petId, userId, state);
   }
 
+  @Patch(':id')
+  updateAppointment(
+    @Param('id') id: string,
+    @Body() updateAppointmentDto: UpdateAppointmentDto
+  ) {
+    return this.appointmentService.updateAppointment(id, updateAppointmentDto);
+  }
 
   @Get(':id')
-  findAppointmentById(@Param('id') id:string){
-    return this.appointmentService.findOne(id)
+  findAppointmentById(@Param('id') id: string) {
+    return this.appointmentService.findOne(id);
   }
 
-  update(
-    @Param('id') id: string,
-    @Body() updateAppointmentDto: UpdateAppointmentDto,
-  ) {
-    return this.appointmentService.update(+id, updateAppointmentDto);
-  }
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateAppointmentDto: UpdateAppointmentDto,
+  // ) {
+  //   return this.appointmentService.update(+id, updateAppointmentDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

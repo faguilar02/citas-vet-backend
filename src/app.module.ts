@@ -8,6 +8,7 @@ import { PetsModule } from './pets/pets.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { AppointmentDetailsModule } from './appointment-details/appointment-details.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -31,6 +32,7 @@ import { AppointmentDetailsModule } from './appointment-details/appointment-deta
     MedicalHistoryModule,
     AppointmentModule,
     AppointmentDetailsModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [],

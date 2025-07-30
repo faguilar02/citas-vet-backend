@@ -11,6 +11,11 @@ import {
   SetMetadata,
   ParseUUIDPipe,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -25,14 +30,35 @@ import { User } from './entities/user.entity';
 import { Auth, GetUser, RawHeaders, RoleProtected } from './decorators';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { UserRole } from './models/enums';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post('register')
-  registerUser(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  @UseInterceptors(FileInterceptor('file'))
+  async registerUser(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
+      file,
+    );
+
+    return this.authService.register(createUserDto, secure_url, public_id);
   }
 
   @Post('login')

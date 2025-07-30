@@ -118,21 +118,9 @@ export class AppointmentService {
         );
       }
 
-      let medicalHistory = await this.medicalHistoryService.findOneByPetId(
-        petId,
-        queryRunner.manager,
-      );
-
-      if (!medicalHistory) {
-        medicalHistory = await this.medicalHistoryService.create(
-          { petId },
-          queryRunner.manager,
-        );
-      }
-
       const appointment = this.appointmentRepository.create({
         petId,
-        medicalHistoryId: medicalHistory.id,
+        // medicalHistoryId: medicalHistory.id,
         veterinarianId,
         state: AppointmentState.CONFIRMED,
         ...appointmentData,
@@ -142,6 +130,59 @@ export class AppointmentService {
       await queryRunner.commitTransaction();
 
       return appointment;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async updateAppointment(
+    id: string,
+    updateAppointmentDto: UpdateAppointmentDto,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const appointment = await this.findOne(id, queryRunner.manager);
+
+      if (!appointment) {
+        throw new NotFoundException('appointment not found');
+      }
+
+      let medicalHistory = await this.medicalHistoryService.findOneByPetId(
+        appointment.petId,
+        queryRunner.manager,
+      );
+
+      const { state } = updateAppointmentDto;
+
+      if (!medicalHistory && state === AppointmentState.COMPLETED) {
+        medicalHistory = await this.medicalHistoryService.create(
+          { petId: appointment.petId },
+          queryRunner.manager,
+        );
+      }
+
+      const updateData: any = {
+        id,
+        ...updateAppointmentDto,
+      };
+
+      if (medicalHistory) {
+        updateData.medicalHistoryId = medicalHistory.id;
+      }
+
+      const appointmentFromBD = await this.appointmentRepository.preload(
+        updateData,
+      );
+      await queryRunner.manager.save(appointmentFromBD);
+
+      await queryRunner.commitTransaction();
+      return appointmentFromBD;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -215,11 +256,19 @@ export class AppointmentService {
     });
   }
 
-  async findAppointmentsByOwnerId(userId: string, last?: number) {
+  async findAppointmentsByOwnerId(
+    userId: string,
+    state?: string,
+    last?: number,
+  ) {
     const queryBuilder = this.appointmentRepository
       .createQueryBuilder('appointment')
       .leftJoinAndSelect('appointment.pet', 'pet')
       .where('pet.ownerId = :userId', { userId });
+
+    if (state) {
+      queryBuilder.andWhere('appointmnet.state = :state', { state });
+    }
 
     const appointments = await queryBuilder.getMany();
 
@@ -231,14 +280,18 @@ export class AppointmentService {
     return appointments;
   }
 
-  async findOne(id:string){
+  async findOne(id: string, manager?: EntityManager) {
+    let appointment: Appointment;
 
-    const appoinment = await this.appointmentRepository.findOneBy({id})
+    if (manager) {
+      appointment = await manager.findOne(Appointment, { where: { id } });
+    } else {
+      appointment = await this.appointmentRepository.findOneBy({ id });
+    }
 
-    if(!appoinment) throw new NotFoundException('appointment not found')
+    if (!appointment) throw new NotFoundException('appointment not found');
 
-    return appoinment
-
+    return appointment;
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {

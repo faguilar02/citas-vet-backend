@@ -6,11 +6,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Veterinarian } from './entities/veterinarian.entity';
 
 import { BaseDispoModule } from 'src/base-dispo/base-dispo.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [AuthModule, BaseDispoModule, TypeOrmModule.forFeature([Veterinarian])],
+  imports: [
+    AuthModule,
+    BaseDispoModule,
+    CloudinaryModule,
+    TypeOrmModule.forFeature([Veterinarian]),
+  ],
   controllers: [VeterinarianController],
   providers: [VeterinarianService],
-  exports: [VeterinarianService, TypeOrmModule]
+  exports: [VeterinarianService, TypeOrmModule],
 })
 export class VeterinarianModule {}

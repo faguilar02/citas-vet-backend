@@ -17,11 +17,18 @@ export class PetsService {
   constructor(
     @InjectRepository(Pet) private readonly petsRepository: Repository<Pet>,
   ) {}
-  async create(createPetDto: CreatePetDto, userId: string): Promise<Pet> {
+  async create(
+    createPetDto: CreatePetDto,
+    userId: string,
+    secure_url?: string,
+    public_id?: string,
+  ): Promise<Pet> {
     const { ownerId, ...data } = createPetDto;
 
     const pet = this.petsRepository.create({
       ownerId: userId,
+      secure_url,
+      public_id,
       ...data,
     });
 
@@ -45,9 +52,9 @@ export class PetsService {
     });
 
     if (!pets) throw new NotFoundException('pets have been not found');
-    
-    pets.forEach( (p) => delete p.appointment)
-    return pets
+
+    pets.forEach((p) => delete p.appointment);
+    return pets;
   }
 
   async findOneByIdAndOwner(

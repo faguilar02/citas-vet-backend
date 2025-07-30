@@ -19,6 +19,11 @@ export class Pet {
   @Column('uuid')
   ownerId: string;
 
+  @Column('text', {nullable: true})
+  secure_url: string;
+  @Column('text', {nullable: true})
+  public_id: string;
+
   @ManyToOne(() => User, (u) => u.userId, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'userId' })
   owner: User;

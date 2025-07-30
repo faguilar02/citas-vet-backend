@@ -32,14 +32,14 @@ export class Appointment {
   })
   state: AppointmentState;
 
-  @Column('uuid')
+  @Column('uuid', {nullable: true})
   medicalHistoryId: string;
   @Column('uuid')
   petId: string;
   @Column('uuid')
   veterinarianId: string
 
-  @ManyToOne(() => MedicalHistory, (mh) => mh.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => MedicalHistory, (mh) => mh.id, { onDelete: 'CASCADE'})
   @JoinColumn({ name: 'medicalHistoryId', referencedColumnName: 'id' })
   medicalHistory: MedicalHistory;
 
